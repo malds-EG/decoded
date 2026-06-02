@@ -28,7 +28,7 @@ export function FormatDrawer({ format, onClose }: Props) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-60 bg-black/70 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -41,8 +41,8 @@ export function FormatDrawer({ format, onClose }: Props) {
           <motion.aside
             role="dialog"
             aria-modal
-            aria-label={format.headline}
-            className="fixed right-0 top-0 z-40 flex h-full w-full max-w-[480px] flex-col overflow-y-auto bg-black px-8 py-10"
+            aria-label={format.name}
+            className="fixed right-0 top-0 z-60 flex h-full w-full max-w-[480px] flex-col overflow-y-auto bg-black px-8 py-10"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -76,7 +76,7 @@ export function FormatDrawer({ format, onClose }: Props) {
 
               {/* Headline */}
               <h2 className="font-headline text-[40px] font-semibold leading-[1.05] tracking-tight text-white md:text-[52px]">
-                {format.headline}
+                {format.name}
               </h2>
 
               {/* Divider */}
