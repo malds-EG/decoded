@@ -169,7 +169,7 @@ Reduced motion: `useReducedMotion()` from `hooks/useReducedMotion.ts` — pass `
 
 **Hero wave background (`HeroWave.tsx`):** Two blurred div layers, each with a `motion.path` that morphs between 3 random SVG keyframes. `COUNT = 10` fixed interior peaks; x positions are generated once per layer (`makeXs()`) and held constant across keyframes so morphing only interpolates Y — producing a natural mountain-range silhouette. Layer 1: ambient glow (`blur(90px)`, opacity 0.25, dur 5–12s). Layer 2: definition glow (`blur(35px)`, opacity 0.65, dur 7–16s). Both use `repeatType: "mirror"` for seamless back-and-forth. No Y-axis translation on the wrapper — the wave base stays anchored to the bottom. Peak shape tuning: adjust `baseY / minY / maxY` in the `buildKeyframes()` calls inside `useEffect`. Outer wrapper fades in `opacity: 0 → 1` over 2s after 1s delay.
 
-**Nav (`features/nav/Nav.tsx`):** `"use client"`. `motion.header` with `y: "-100%"` hide on scroll-down (>80px) / show on scroll-up — paused when mobile menu is open. Pill resizes `max-w-[1072px] → max-w-[834px]` (CSS transition) once scrollY > 85% of viewport height, matching Framer's `DesktopOnScroll` variant. Scroll listener adds `bg-black/70 backdrop-blur-md` at >40px. `onScroll()` called immediately on mount so blur/size state is correct on page reload mid-scroll. Desktop: logo left, links center (roll-up hover), "Apply to speak" → `/speaker-form` right. Mobile: burger → dropdown card with staggered links + full-width CTA → `/speaker-form`. All section links use `el.scrollIntoView({ behavior: "smooth" })`. `lastY` stored in `useRef` (not state) to avoid re-renders.
+**Nav (`features/nav/Nav.tsx`):** `"use client"`. `motion.header` with `y: "-100%"` hide on scroll-down (>80px) / show on scroll-up — paused when mobile menu is open. Fixed `max-w-[1440px]` pill — no shrink behavior. Scroll listener adds `bg-black/70 backdrop-blur-md` at >40px. `onScroll()` called immediately on mount so blur state is correct on page reload mid-scroll. Desktop: logo left, links `absolute left-1/2 -translate-x-1/2` (true geometric center), CTA right. Mobile: burger → dropdown card with staggered links + full-width CTA → `/speaker-form`. All section links use `el.scrollIntoView({ behavior: "smooth" })`. `lastY` stored in `useRef` (not state) to avoid re-renders.
 
 **About blinds reveal (`About.tsx`):** `"use client"`. Words rendered as `<span data-word>` on SSR (fully readable). After mount, `useEffect` calls `measureLines()` which groups words by `offsetTop` (4px tolerance) into visual lines. Each line renders as `relative block overflow-hidden` with a static text span underneath and an `absolute inset-0 bg-white` `motion.span` on top. The white panel starts at `x: 0%` (covering text) and slides to `±105%` on scroll-in. Uses `variants` with `hidden: { transition: { duration: 0 } }` for instant off-screen reset so the animation replays every time the section enters the viewport (`once: false`).
 
@@ -193,7 +193,7 @@ Session submission flow for potential speakers. Separate page, not part of the h
 
 **Validation (`lib/validation/schema.ts`):** Zod v4. `z.discriminatedUnion("speakerType", [...])` intersected with `sessionFields`. All fields have explicit error messages and `max()` caps. Shared between client (RHF resolver) and server (`safeParse` in route).
 
-**API route (`app/api/speaker-submission/route.ts`):** JSON parse (try/catch) → `safeParse` (400 on invalid) → `buildAdminEmail()` (sectioned HTML table, all values HTML-escaped) → `sendSessionSubmissionEmail`. Confirmation to applicant is non-blocking (`.catch` only).
+**API route (`app/api/speaker-submission/route.ts`):** JSON parse (try/catch) → `safeParse` (400 on invalid) → `buildAdminEmail()` (sectioned HTML table, all values HTML-escaped). **Email sends are currently commented out for demo** — route returns `{ success: true }` immediately and logs the payload to the server console. Re-enable by uncommenting the `sendSessionSubmissionEmail` and `sendConfirmationEmail` calls (marked `TODO`).
 
 **Email (`lib/email/`):**
 - `transporter.ts` — `EmailClient` from `@azure/communication-email`. Guards for missing `AZURE_COMMUNICATION_CONNECTION_STRING` with a throw at module load. Exports `SENDER_EMAIL` and `ADMIN_EMAILS` (comma-separated → array of `{ address }` objects).
@@ -215,9 +215,10 @@ NEXT_PUBLIC_BASE_URL                      # for logo URL in confirmation email (
 
 Built from Framer's `/404` page (`nodeId="BigvQa7Dl"`). `"use client"` for Framer Motion.
 
-- **Background:** `bg-black` full-screen centered stack — matches Framer `backgroundColor="/Primary/Black"`
-- **404 number:** `font-headline font-bold` with `fontSize: clamp(96px, 22vw, 320px)` — Clash Display Bold, white, matching Framer's `font="FS;Clash Display-bold"`
-- **Button:** `<Button variant="light">Back to Home</Button>` wrapped in `<Link href="/">` — matches Framer's Light variant button pointing to `/`
+- **Background:** `bg-black` full-screen centered stack
+- **404 number:** `font-headline font-bold` with `fontSize: clamp(96px, 22vw, 320px)` — Clash Display Bold
+- **Colours:** main `text-red` (`#E81A2D`) on top; static shadow `text-red-light` (`#FF8A7A`) offset right via `translate-x-[10px] sm:translate-x-[20px] lg:translate-x-[35px]` — no animation
+- **Button:** `<Button variant="light">Back to Home</Button>` in `<Link href="/">` — matches Framer's Light variant
 - No Nav, no Footer — standalone full-screen page
 
 ---
