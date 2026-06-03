@@ -10,7 +10,7 @@
 - Tailwind CSS v4 — all styling · Framer Motion v12 — all animation
 - `cn()` via `clsx` + `tailwind-merge` in `lib/cn.ts`
 - Forms: `react-hook-form` + `@hookform/resolvers` + `zod` v4
-- Email: `@azure/communication-email` — Azure Communication Services
+- Email: `@aws-sdk/client-sesv2` — AWS SES v2
 - Icons: `@phosphor-icons/react` — used for `ArrowCircleUpRight` in FormatCard and anywhere directional icons are needed
 - No MUI, Emotion, or Radix unless explicitly requested
 - Favicon: `metadata.icons: { icon: "/red-logo.svg" }` in `app/layout.tsx` — no `favicon.ico`
@@ -203,14 +203,12 @@ Session submission flow for potential speakers. Separate page, not part of the h
 **API route (`app/api/speaker-submission/route.ts`):** JSON parse (try/catch) → `safeParse` (400 on invalid) → `buildAdminEmail()` (sectioned HTML table, all values HTML-escaped) → `sendSessionSubmissionEmail` → fire-and-forget `sendConfirmationEmail`. **Email sends are live** — remove the Azure env vars to disable.
 
 **Email (`lib/email/`):**
-- `transporter.ts` — `EmailClient` from `@azure/communication-email`. Guards for missing `AZURE_COMMUNICATION_CONNECTION_STRING` with a throw at module load. Exports `SENDER_EMAIL` and `ADMIN_EMAILS` (comma-separated → plain string array).
-- `send-session-submission.ts` — `sendSessionSubmissionEmail` (admin notification, HTML table of all fields) + `sendConfirmationEmail` (applicant confirmation). Confirmation email is a fully responsive dark HTML template (`max-width:640px`, `#1e1e1e` bg) with: red header bar (`#e81a2d`) holding `decoded-logo-email.png` + `EG Logo V2 1.png` left and `Decoded Icon V3 1.png` overflowing right (`margin-bottom:-28px`); "WE GOT YOUR PROPOSAL" heading; body copy; "WHAT HAPPENS NEXT" 3-step table (Review / Discovery call / Confirmed); CTA banner (`rgb(72,18,18)`) with `gcx@eg.dk` + "GET IN TOUCH" button; footer (black, `decoded-logo-email.png` + copyright). **Fonts:** `@font-face` loads `ClashDisplay-Semibold.woff2` (headings) and `Aileron-600/700.woff2` (body) from `${NEXT_PUBLIC_BASE_URL}/fonts/` — falls back to `sans-serif`. **Responsive:** `@media (max-width:600px)` stacks step rows and CTA banner columns.
+- `transporter.ts` — `SESv2Client` from `@aws-sdk/client-sesv2`. Region hardcoded to `eu-central-1`. No credentials passed — SDK auto-picks the ECS task role via the container credentials endpoint. Exports `sendMail({ to, subject, html, text? })` helper (returns `MessageId`), `SENDER_EMAIL` (`no-reply@insights.amplify.egsync.com`), and `ADMIN_EMAILS` (from env, comma-separated string array).
+- `send-session-submission.ts` — `sendSessionSubmissionEmail` (admin notification) + `sendConfirmationEmail` (applicant). **Currently in demo mode** — both functions log to console and return without sending. To go live: remove the `console.log` lines and uncomment the `sendMail(...)` calls marked in each function. Confirmation email is a fully responsive dark HTML template (`max-width:640px`, `#1e1e1e` bg) with: red header bar (`#e81a2d`) holding `decoded-logo-email.png` + `EG Logo V2 1.png` left and `Decoded Icon V3 1.png` overflowing right (`margin-bottom:-28px`); "WE GOT YOUR PROPOSAL" heading; body copy; "WHAT HAPPENS NEXT" 3-step table (Review / Discovery call / Confirmed); CTA banner (`rgb(72,18,18)`) with `gcx@eg.dk` + "GET IN TOUCH" button; footer (black, `decoded-logo-email.png` + copyright). **Fonts:** `@font-face` loads `ClashDisplay-Semibold.woff2` (headings) and `Aileron-600/700.woff2` (body) from `${NEXT_PUBLIC_BASE_URL}/fonts/` — falls back to `sans-serif`. **Responsive:** `@media (max-width:600px)` stacks step rows and CTA banner columns.
 
 **Required env vars:**
 ```
-AZURE_COMMUNICATION_CONNECTION_STRING=endpoint=https://<resource>.communication.azure.com/;accesskey=<key>
-SENDER_EMAIL=DoNotReply@<verified-domain>
-ADMIN_EMAILS=email@eg.dk,another@eg.dk   # comma-separated
+ADMIN_EMAILS=email@eg.dk,another@eg.dk   # comma-separated — no AWS keys needed (ECS task role)
 NEXT_PUBLIC_BASE_URL                      # base URL for font + image paths in emails
 ```
 

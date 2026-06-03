@@ -1,4 +1,4 @@
-import { emailClient, SENDER_EMAIL, ADMIN_EMAILS } from "./transporter";
+import { sendMail, ADMIN_EMAILS } from "./transporter";
 
 export async function sendSessionSubmissionEmail({
   subject,
@@ -7,12 +7,9 @@ export async function sendSessionSubmissionEmail({
   subject: string;
   html: string;
 }) {
-  const poller = await emailClient.beginSend({
-    senderAddress: SENDER_EMAIL,
-    recipients: { to: ADMIN_EMAILS },
-    content: { subject, html },
-  });
-  return poller.pollUntilDone();
+  // Demo mode — remove the log line and uncomment sendMail to go live.
+  console.log("[demo] sendSessionSubmissionEmail", { subject, to: ADMIN_EMAILS });
+  // return sendMail({ to: ADMIN_EMAILS, subject, html });
 }
 
 export async function sendConfirmationEmail({
@@ -135,10 +132,11 @@ export async function sendConfirmationEmail({
 </html>`
 ;
 
-  const poller = await emailClient.beginSend({
-    senderAddress: SENDER_EMAIL,
-    recipients: { to: [{ address: to }] },
-    content: { subject: "We received your proposal — Decoded", html },
-  });
-  return poller.pollUntilDone();
+  // Demo mode — remove the log line and uncomment sendMail to go live.
+  console.log("[demo] sendConfirmationEmail", { to, name });
+  // return sendMail({
+  //   to,
+  //   subject: "We received your proposal — Decoded",
+  //   html,
+  // });
 }
