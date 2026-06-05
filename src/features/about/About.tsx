@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { aboutContent } from "./about.data";
-
 export function About() {
   const reduced = useReducedMotion();
   const headingRef = useRef<HTMLHeadingElement>(null);

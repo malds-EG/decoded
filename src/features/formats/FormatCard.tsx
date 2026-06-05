@@ -166,7 +166,7 @@ export function FormatCard({ format, priority = false, index, onOpen }: Props) {
   return (
     <motion.article
       ref={articleRef}
-      className="grid w-full grid-cols-1  gap-10 rounded-2xl bg-black p-5 text-white md:grid-cols-2 md:gap-16 md:p-[30px]"
+      className="grid w-full grid-cols-1  gap-10 rounded-2xl bg-black p-5 text-white md:grid-cols-2 md:gap-[32px] md:p-[30px]"
     >
       <div ref={scope} className="contents">
         <div

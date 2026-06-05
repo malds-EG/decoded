@@ -14,17 +14,14 @@ function SuccessModal({ onDone }: { onDone: () => void }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCount((c) => {
-        if (c <= 1) {
-          clearInterval(interval);
-          onDone();
-          return 0;
-        }
-        return c - 1;
-      });
+      setCount((c) => (c <= 1 ? 0 : c - 1));
     }, 1000);
     return () => clearInterval(interval);
-  }, [onDone]);
+  }, []);
+
+  useEffect(() => {
+    if (count === 0) onDone();
+  }, [count, onDone]);
 
   return (
     <motion.div
@@ -144,7 +141,7 @@ When you submit this form, it will not automatically collect your details like n
             name="speakerType"
             render={({ field }) => (
               <div className="flex gap-8">
-                {(["employee", "external"] as const).map((val) => (
+                {(["EG employee", "external"] as const).map((val) => (
                   <motion.label
                     key={val}
                     animate={{ opacity: confirmed && field.value !== val ? 0.25 : 1 }}
@@ -160,7 +157,7 @@ When you submit this form, it will not automatically collect your details like n
                       className="accent-red h-4 w-4"
                     />
                     <span className="font-body text-white">
-                      {val === "employee" ? "EG Employee" : "External Speaker"}
+                      {val === "EG employee" ? "EG Employee" : "External Speaker"}
                     </span>
                   </motion.label>
                 ))}
@@ -244,7 +241,7 @@ When you submit this form, it will not automatically collect your details like n
             </div>
           )}
 
-          {speakerType === "employee" && (
+          {speakerType === "EG employee" && (
             <div className="grid gap-6 md:grid-cols-2">
               <CustomInput form={form} name="fullName" label="Full Name" />
               <CustomInput form={form} name="businessUnit" label="Business Unit" />

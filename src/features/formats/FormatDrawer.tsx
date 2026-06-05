@@ -67,7 +67,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-60 bg-black/50 backdrop-blur-xs"
+            className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -81,7 +81,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
             role="dialog"
             aria-modal
             aria-label={format.name}
-            className="fixed right-0 top-0 z-60 h-full w-full border-l-2 lg:border-red/50 bg-black xl:max-w-[40vw] lg:max-w-[50vw]"
+           className="fixed right-0 top-0 z-60 h-full w-full bg-black lg:max-w-[50vw] shadow-[-12px_0_20px_rgba(255,0,0,0.5)]"
             style={{ willChange: "transform" }}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
