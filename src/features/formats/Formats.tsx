@@ -62,7 +62,7 @@ export function Formats({ onApply, onOpenFormat }: { onApply?: () => void; onOpe
           {/* Intro paragraph echoes up directly behind it */}
           <motion.p 
             variants={introVariants}
-            className="max-w-[467px] font-body font-semibold text-[clamp(16px,2vw,20px)] text-black"
+            className="max-w-[467px] font-body font-semibold text-[clamp(16px,2vw,20px)] text-white"
           >
             {formatsContent.intro}
           </motion.p>
