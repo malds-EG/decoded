@@ -166,6 +166,9 @@ export function FormatCard({ format, priority = false, index, onOpen }: Props) {
   return (
     <motion.article
       ref={articleRef}
+      initial={{ opacity: 0.7, y: 80 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 1.9, ease: [0.215, 0.61, 0.355, 1] }}
       className="grid w-full grid-cols-1  gap-10 rounded-2xl bg-black p-5 text-white md:grid-cols-2 md:gap-[32px] md:p-[30px]"
     >
       <div ref={scope} className="contents">

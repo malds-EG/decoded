@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Button } from "@/components";
+import { ApplyToSpeakButton } from "@/components";
 import { heroContent } from "./hero.data";
 import { HeroWave } from "./HeroWave";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -47,11 +47,26 @@ export function Hero({ onApply }: { onApply?: () => void }) {
           >
             {heroContent.headline}
           </motion.h1>
-          <motion.div {...fadeIn(3.3)}>
-            
-            <Button variant="light" onClick={onApply}>
-              {heroContent.cta}
-            </Button>
+          <motion.div 
+           className="flex flex-col items-center gap-3"
+            {...fadeIn(3.3)}
+          > 
+          <ApplyToSpeakButton onClick={onApply} />
+            <span className="font-body text-sm text-white">
+              {heroContent.poweredBy.label}
+            </span>
+            <div className="flex items-center gap-[20px]">
+              {heroContent.poweredBy.logos.map((logo) => (
+                <Image
+                  key={logo.alt}
+                  src={logo.src}
+                  alt={logo.alt}
+                  width={logo.width}
+                  height={logo.height}
+                  style={{ height: "32px", width: "auto", filter: "brightness(0) invert(1)"}}
+                />
+              ))}
+            </div>
           </motion.div>
         </div>
       </div>

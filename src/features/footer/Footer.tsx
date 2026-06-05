@@ -111,7 +111,8 @@ export function Footer() {
         <span className="font-body text-xs font-normal md:hidden">{footerContent.copyright}</span>
         <span className="flex items-center gap-2 font-body text-xs font-normal md:hidden">
           {footerContent.poweredBy}
-          <Image src="/Amplify-logo.svg" alt="Amplify" width={281} height={75} className="h-[32px] w-auto brightness-0" />
+           <Image src="/EG Logo V2 1.png" alt="EG" width={40} height={40} className="h-[20px] w-auto brightness-0" />
+          <Image src="/Amplify-logo.svg" alt="Amplify" width={281} height={75} className="h-[20px] w-auto brightness-0" />
         </span>
 
         {/* Logo — spans full footer width */}
@@ -128,7 +129,8 @@ export function Footer() {
           <span>{footerContent.copyright}</span>
           <span className="flex items-center gap-2">
             {footerContent.poweredBy}
-            <Image src="/Amplify-logo.svg" alt="Amplify" width={281} height={75} className="h-[24px] w-auto brightness-0" />
+<Image src="/EG Logo V2 1.png" alt="EG" width={40} height={40} className="h-[20px] w-auto brightness-0" />
+            <Image src="/Amplify-logo.svg" alt="Amplify" width={281} height={75} className="h-[20px] w-auto brightness-0" />
           </span>
         </div>
 

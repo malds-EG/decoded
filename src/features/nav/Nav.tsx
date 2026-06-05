@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Button } from "@/components";
+import { ApplyToSpeakButton } from "@/components";
 
 const links = [
   { label: "About",   href: "#about" },
@@ -88,9 +88,7 @@ export function Nav({ onApply }: { onApply?: () => void }) {
         </ul>
 
         {/* Desktop CTA */}
-        <Button variant="light" onClick={onApply} className="hidden md:block">
-          Apply to speak
-        </Button>
+        <ApplyToSpeakButton onClick={onApply} className="hidden md:block" />
 
         {/* Burger — mobile only */}
         <button
@@ -143,12 +141,10 @@ export function Nav({ onApply }: { onApply?: () => void }) {
               transition={{ duration: 0.18, delay: 0.06 + links.length * 0.05 }}
               className="px-4 pb-4"
             >
-              <button
+              <ApplyToSpeakButton
                 onClick={() => { setMenuOpen(false); onApply?.(); }}
-                className="block w-full rounded-2xl bg-white py-4 text-center font-body text-base font-bold text-black transition-colors duration-150 hover:bg-off-white"
-              >
-                Apply to speak
-              </button>
+                className="w-full"
+              />
             </motion.div>
           </motion.div>
         )}
