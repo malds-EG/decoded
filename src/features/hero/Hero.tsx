@@ -24,12 +24,14 @@ export function Hero({ onApply }: { onApply?: () => void }) {
     };
 
   return (
-    <section
-  id="hero"
- className="sticky top-0 z-10 flex h-dvh w-full flex-col items-center justify-center gap-16 overflow-hidden bg-black px-0 py-[100px] text-white"
->
-      <HeroWave />
-      <div className="relative z-[2] flex w-full max-w-[1440px] flex-col items-center justify-center overflow-hidden px-5 mt-12 md:px-8">
+      <section
+        id="hero"
+        className="relative z-[10] flex min-h-dvh w-full flex-col items-center justify-center gap-16 overflow-hidden bg-black px-0 py-[100px] text-white"
+      >
+      <div className="absolute inset-0 -z-[10]">
+        <HeroWave />
+      </div>
+      <div className="relative z-[10] flex w-full max-w-[1440px] flex-col items-center justify-center overflow-hidden px-5 mt-12 md:px-8">
         <motion.div data-hero-logo className="flex w-full flex-col items-center justify-center" {...fadeIn(2.5)}>
           <Image
             src={heroContent.logo.src}
@@ -48,11 +50,12 @@ export function Hero({ onApply }: { onApply?: () => void }) {
             {heroContent.headline}
           </motion.h1>
           <motion.div 
-           className="flex flex-col items-center gap-3"
+           className="flex flex-col items-center gap-[34px]"
             {...fadeIn(3.3)}
           > 
           <ApplyToSpeakButton onClick={onApply} />
-            <span className="font-body text-sm text-white">
+           <div>
+             <span className="font-body text-sm text-white">
               {heroContent.poweredBy.label}
             </span>
             <div className="flex items-center gap-[20px]">
@@ -66,6 +69,7 @@ export function Hero({ onApply }: { onApply?: () => void }) {
                   style={{ height: "32px", width: "auto", filter: "brightness(0) invert(1)"}}
                 />
               ))}
+            </div>
             </div>
           </motion.div>
         </div>

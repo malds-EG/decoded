@@ -141,7 +141,7 @@ export async function sendConfirmationEmail({
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #6d7585;
+      color: #a0abf4;
       margin-bottom: 20px;
     }
 
@@ -322,7 +322,7 @@ export async function sendConfirmationEmail({
       <span>${safeName}</span>
     </h1>
     <p class="greeting-body">
-      Thank you for your submitting you proposal to Decoded. Our team will review your proposal carefully and will be in touch within 5 working days.
+      Thank you for submitting your proposal to Decoded. Our team will review your proposal carefully and will be in touch within 5 working days.
     </p>
   </div>
 
@@ -343,7 +343,7 @@ export async function sendConfirmationEmail({
           <td class="step-value">If it's a fit, we'll reach out to schedule a 30-minute conversation about your session.</td>
         </tr>
         <tr>
-          <td class="step-label">3. Confirmed:</td>
+          <td class="step-label" style="padding-bottom: 16px;">3. Confirmed:</td>
           <td class="step-value">Format, date, and logistics locked. We handle everything from here.</td>
         </tr>
       </tbody>

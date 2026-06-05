@@ -22,7 +22,7 @@ const headerItemVariants: Variants = {
 
 export function Reasons() {
   return (
-    <section id="reasons" className="relative z-10 bg-black px-5 py-24 text-white md:px-8 md:py-[100px] overflow-hidden">
+    <section id="reasons" className="relative z-[10] bg-black px-5 py-24 text-white md:px-8 md:py-[100px] overflow-hidden">
       <motion.div 
         variants={containerVariants}
         initial="hidden"

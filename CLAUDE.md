@@ -22,7 +22,7 @@
 ```
 src/
 ├── app/                        # Next.js App Router (layout.tsx, page.tsx, globals.css)
-│   ├── HomeClient.tsx          # Client boundary — manages SpeakerFormModal open state
+│   ├── HomeClient.tsx          # Client boundary — manages SpeakerFormModal + FormatDrawer open state
 │   └── api/speaker-submission/ # POST route — validates + emails submission
 ├── components/                 # Shared primitives: Button, BrutalismIcon
 ├── features/                   # One folder per page section — self-contained
@@ -62,36 +62,38 @@ features/hero/
 
 ## Page Layout — `app/page.tsx`
 
-`page.tsx` is a Server Component. Static sections are passed as props to `HomeClient`, which holds the `SpeakerFormModal` open state and distributes `onApply` callbacks.
+`page.tsx` is a Server Component. Static sections are passed as props to `HomeClient`, which holds the `SpeakerFormModal` and `FormatDrawer` open state and distributes `onApply` / `onOpenFormat` callbacks.
 
 ```tsx
 {/* app/page.tsx — Server Component */}
 <HomeClient
   before={<><About /><Ticker /></>}
-  after={<><Ticker /><Reasons /><Faq /></>}
+  after={<><Ticker /><Reasons /><Faq /><div className="h-[var(--footer-height)]" aria-hidden /></>}
   footer={<Footer />}
 />
 
 {/* HomeClient renders: */}
 <Loader />
-<Nav onApply={open} />                {/* fixed top-0 z-50 */}
-<main className="flex flex-1 flex-col pb-[680px] md:pb-[650px]">
-  <Hero onApply={open} />             {/* sticky top-0 z-10 */}
-  <div className="relative">
+<Nav onApply={open} />                {/* fixed top-0 z-11 */}
+<main id="main-content" className="flex flex-1 flex-col">
+  <Hero onApply={open} />             {/* relative z-[10] — scrolls normally */}
+  <div className="relative z-[10]">
     {before}                          {/* About, Ticker */}
-    <Formats onApply={open} />
-    {after}                           {/* Ticker, Reasons, Faq */}
+    <Formats onApply={open} onOpenFormat={setActiveFormat} />
+    {after}                           {/* Ticker, Reasons, Faq, footer spacer */}
   </div>
   {footer}                            {/* Footer — fixed bottom-0 z-0 */}
 </main>
 <SpeakerFormModal isOpen={formOpen} onClose={() => setFormOpen(false)} />
+<FormatDrawer format={activeFormat} onClose={() => setActiveFormat(null)} onApply={open} />
 ```
 
-- Nav is `fixed top-0 z-50` — always above hero and all sections
-- Hero is `sticky top-0 z-10` — pinned while sections scroll over it
-- All body sections are `relative z-10` — same z-index, later in DOM = paint on top
-- Footer is `fixed inset-x-0 bottom-0 z-0 h-[clamp(400px,62vh,88vh)]` — always behind content, revealed at end
-- `pb-` on main must always match footer height
+- Nav is `fixed top-0 z-11` — always above hero and all sections
+- Hero is `relative z-[10]` — scrolls normally; the `relative z-[10]` wrapper comes later in DOM at the same z-level, so sections paint over the hero as they scroll up
+- Body sections wrapper is `relative z-[10]` — creates a stacking context; sections inside cover the hero
+- Footer is `fixed inset-x-0 bottom-0 z-0 h-[var(--footer-height)]` — always behind content, revealed when the footer spacer div scrolls out of view
+- Footer spacer `div.h-[var(--footer-height)]` at end of `after` prop gives the page enough scroll height to fully reveal the footer
+- `FormatDrawer` is rendered at `HomeClient` root level (outside the `relative z-[10]` wrapper) so its z-index (`z-13` panel, `z-12` backdrop) is evaluated in the root stacking context — above Nav's `z-11`
 
 ---
 
@@ -149,7 +151,7 @@ Hero → About → Ticker → Formats → Ticker → Reasons → FAQs → Footer
 
 | Section | bg | Notes |
 |---|---|---|
-| Hero | black | sticky, h-dvh · animated SVG wave bg (`HeroWave.tsx`) |
+| Hero | black | relative z-[10], min-h-dvh · animated SVG wave bg (`HeroWave.tsx`) |
 | About | black | h-screen, text-red |
 | Ticker | white | infinite marquee, 110px height, Clash Display · starts fully visible, scrolls left |
 | Formats | red | 6 stacked cards |
@@ -195,7 +197,7 @@ Reduced motion: `useReducedMotion()` from `hooks/useReducedMotion.ts` — pass `
 
 **FormatCard pixel mask reveal (`FormatCard.tsx`):** `"use client"`. Image covered by a single `<canvas>` (replaces old 450-div grid — 1 DOM node vs 2,700). `PixelCanvas` component: `ResizeObserver` syncs buffer at `displaySize × devicePixelRatio`; draws white cover before animation starts. On `inView`, one `rAF` loop runs: red pass first (behind), white pass on top — per-cell opacities computed from `Float32Array` timings built once at start. `BLEED` (≤0.18s early white start) exposes red below the scan line; `JITTER` (≤0.1s extra red delay) leaves fragments above it. Loop cancels itself after all cells clear. Tunables: `GRID / REVEAL_DELAY / REVEAL_DURATION / WHITE_DUR / RED_DUR / JITTER / BLEED`. `onOpen?: () => void` prop — clicking the image or "Learn more" button opens `FormatDrawer`. Image paths: `/${name.toLowerCase().replace(/\s/g, "-")}.png`. Reduced motion skips canvas entirely. **Learn more button** matches Framer's "ye" component (`j75bhEKWC`): `w-full bg-grey/30 rounded-lg p-6 md:p-[30px]`, space-between flex, `ArrowCircleUpRight` from `@phosphor-icons/react` (24px, nudges up-right on hover), hover bg `grey/50`.
 
-**FormatDrawer (`features/formats/FormatDrawer.tsx`):** `"use client"`. Fixed right panel `w-full lg:max-w-[50vw]` (`z-60`, `bg-black`), scrollable. Slides in `x: "100%" → 0` ease `[0.22, 1, 0.36, 1]` over 450ms. Backdrop (`bg-black/70 backdrop-blur-sm`, `z-60`) closes on click. `Escape` key closes; body scroll locked while open. `Formats.tsx` holds `active: Format | null` state. Layout (top→bottom): header row (format name left + close button right) · image (`w-full md:max-w-[55%]`, `aspect-[4/3]`, `object-cover`) · four `Row` content sections (dot label left + content right, stacks vertically on mobile via `flex-col md:grid`) · "Apply to speak" CTA (`w-4/5` centered, `bg-red`) calls `onApply` prop to open `SpeakerFormModal` · footer `mt-auto`. **Four rows:** "What it is" (paragraph) · "Best for" (list with `border-white/70` item dividers) · "How it runs" (2-col table: label `text-white/25` | value `text-white/50`, `divide-white/70`) · "What to expect" (3 blocks: bold title + dim description). All row separators use `border-white/70`. Data comes from `formats.data.ts` — `FormatMeta` + `ExpectBlock` types, rich content for all 6 formats (heroTitle, tag, drawerTitle, whatItIs, bestFor, meta, expect).
+**FormatDrawer (`features/formats/FormatDrawer.tsx`):** `"use client"`. Fixed right panel `w-full lg:max-w-[50vw]` (`z-13`, `bg-black`), scrollable. Slides in `x: "100%" → 0` ease `[0.22, 1, 0.36, 1]` over 300ms. Backdrop (`bg-black/60 backdrop-blur-xs`, `z-12`) closes on click. `Escape` key closes; body scroll locked while open. **State lives in `HomeClient`** (`activeFormat: Format | null`) — `Formats.tsx` fires `onOpenFormat(format)` prop, `HomeClient` renders `<FormatDrawer>` outside the `relative z-[10]` wrapper so its z-indices sit in the root stacking context above Nav (`z-11`). Layout (top→bottom): header row (format name left + close button right) · image (`w-full md:max-w-[75%]`, `aspect-[4/3]`, `object-cover`) · four `Row` content sections (dot label left + content right, stacks vertically on mobile via `flex-col md:grid`) · "Apply to speak" CTA (full-width, `bg-red`) calls `onApply` prop to open `SpeakerFormModal` · footer `mt-auto`. **Four rows:** "What it is" (paragraph) · "Best for" (list with `border-white/50` item dividers) · "How it runs" (2-col table: label `text-white/80` | value `text-white/50`, `divide-white/50`) · "What to expect" (3 blocks: bold title + dim description). All row separators use `border-white/20`. Data comes from `formats.data.ts` — `FormatMeta` + `ExpectBlock` types, rich content for all 6 formats (heroTitle, tag, drawerTitle, whatItIs, bestFor, meta, expect).
 
 ---
 

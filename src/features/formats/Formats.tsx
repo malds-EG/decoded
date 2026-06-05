@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion, Variants } from "framer-motion";
 import { FormatCard } from "./FormatCard";
-import { FormatDrawer } from "./FormatDrawer";
 import { formatsContent } from "./formats.data";
 import type { Format } from "./formats.data";
 
@@ -37,15 +35,11 @@ const introVariants: Variants = {
   }
 };
 
-export function Formats({ onApply }: { onApply?: () => void }) {
-  const [active, setActive] = useState<Format | null>(null);
-
+export function Formats({ onApply, onOpenFormat }: { onApply?: () => void; onOpenFormat?: (format: Format) => void }) {
   return (
-    <>
-    <FormatDrawer format={active} onClose={() => setActive(null)} onApply={onApply} />
     <section
       id="formats"
-      className="relative z-10 bg-red px-5 py-24 text-white md:px-8 md:py-[100px] overflow-x-hidden"
+      className="relative z-[10] bg-red px-5 py-24 text-white md:px-8 md:py-[100px] overflow-x-hidden"
     >
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16">
         
@@ -76,11 +70,10 @@ export function Formats({ onApply }: { onApply?: () => void }) {
 
         <div className="flex flex-col gap-8"> 
           {formatsContent.formats.map((format, i) => (
-            <FormatCard key={format.name} format={format} index={i} priority={i === 0} onOpen={() => setActive(format)} />
+            <FormatCard key={format.name} format={format} index={i} priority={i === 0} onOpen={() => onOpenFormat?.(format)} />
           ))}
         </div>
       </div>
     </section>
-    </>
   );
 }

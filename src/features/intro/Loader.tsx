@@ -67,7 +67,7 @@ export function Loader({ onComplete }: LoaderProps) {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-[9999] bg-black"
+          className="fixed inset-0 z-[15] bg-black"
           exit={{ y: "-100%" }}
           transition={{ duration: 1.25, ease: [0.76, 0, 0.85, 1] }}
         >
