@@ -81,7 +81,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
             role="dialog"
             aria-modal
             aria-label={format.name}
-            className="fixed right-0 top-0 z-60 h-full w-full border-l-2 lg:border-red/50 bg-black xl:max-w-[40vw] lg:max-w-[50vw]"
+           className="overflow-hidden fixed right-0 top-0 z-[13] h-full md:w-full bg-black lg:max-w-[50vw] shadow-[-12px_0_20px_rgba(255,0,0,0.5)]"
             style={{ willChange: "transform" }}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -89,7 +89,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
           {/* Scroll container is separate from the animated element */}
-          <div className="flex h-full flex-col overflow-y-auto">
+         <div className="flex h-full flex-col overflow-y-auto bg-black overscroll-contain">
             {/* Header */}
             <div className="flex shrink-0 items-center justify-between px-8 pt-8">
               <span className="font-headline text-[24px] lg:text-[36px] uppercase text-white">

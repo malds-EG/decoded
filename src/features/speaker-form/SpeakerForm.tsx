@@ -105,7 +105,7 @@ export function SpeakerForm({ onSuccess }: { onSuccess?: () => void }) {
       if (!res.ok) throw new Error("Submission failed");
       setSubmitted(true);
     } catch {
-      setSubmitError("Something went wrong. Please try again.");
+      setSubmitError("Failed to send submission — please try again or contact gcx@eg.dk");
     } finally {
       setIsSubmitting(false);
     }

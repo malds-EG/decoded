@@ -28,13 +28,15 @@ export function Hero({ onApply }: { onApply?: () => void }) {
     };
 
   return (
-    <section
-      id="hero"
-      className="sticky top-0 z-10 flex min-h-screen w-full flex-col items-center justify-center gap-16 overflow-hidden bg-black px-0 py-[100px] text-white"
-    >
-      <HeroWave />
-      <div className="relative z-[2] flex w-full max-w-[1440px] flex-col items-center justify-center overflow-hidden px-5 mt-12 md:px-8">
-        <motion.div data-hero-logo className="flex w-full flex-col items-center justify-center" {...fadeIn(LOGO_DELAY)}>
+      <section
+        id="hero"
+        className="relative z-[10] flex min-h-dvh w-full flex-col items-center justify-center gap-16 overflow-hidden bg-black px-0 py-[100px] text-white"
+      >
+      <div className="absolute inset-0 -z-[10]">
+        <HeroWave />
+      </div>
+      <div className="relative z-[10] flex w-full max-w-[1440px] flex-col items-center justify-center overflow-hidden px-5 mt-12 md:px-8">
+        <motion.div data-hero-logo className="flex w-full flex-col items-center justify-center" {...fadeIn(2.6)}>
           <Image
             src={heroContent.logo.src}
             alt={heroContent.logo.alt}
@@ -51,11 +53,28 @@ export function Hero({ onApply }: { onApply?: () => void }) {
           >
             {heroContent.headline}
           </motion.h1>
-          <motion.div {...fadeIn(BUTTON_DELAY)}>
-            
-            <Button variant="light" onClick={onApply}>
-              {heroContent.cta}
-            </Button>
+          <motion.div 
+           className="flex flex-col items-center gap-[34px]"
+            {...fadeIn(3.1)}
+          > 
+          <ApplyToSpeakButton onClick={onApply} />
+           <div>
+             <span className="font-body text-sm text-white">
+              {heroContent.poweredBy.label}
+            </span>
+            <div className="flex items-center gap-[20px]">
+              {heroContent.poweredBy.logos.map((logo) => (
+                <Image
+                  key={logo.alt}
+                  src={logo.src}
+                  alt={logo.alt}
+                  width={logo.width}
+                  height={logo.height}
+                  style={{ height: "32px", width: "auto", filter: "brightness(0) invert(1)"}}
+                />
+              ))}
+            </div>
+            </div>
           </motion.div>
         </div>
       </div>
