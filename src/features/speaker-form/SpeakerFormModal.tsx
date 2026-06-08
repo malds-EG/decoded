@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SpeakerForm } from "./SpeakerForm";
 
@@ -11,6 +11,8 @@ export function SpeakerFormModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
@@ -18,25 +20,31 @@ export function SpeakerFormModal({
     return () => { document.body.style.overflow = prev; };
   }, [isOpen]);
 
+  function handleSuccess() {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    onClose();
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[9998] flex items-start justify-center overflow-y-auto bg-black/80 px-5 py-16 backdrop-blur-sm"
+          ref={scrollRef}
+          className="fixed inset-0 z-[16] flex items-start justify-center overflow-y-auto bg-black/80 px-5 py-16 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
         >
           <motion.div
             role="dialog"
             aria-modal={true}
             aria-label="Apply to speak"
             className="w-full max-w-2xl rounded-2xl bg-grey/60 backdrop-blur-md p-4 md:p-6"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 32, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
             <button
               onClick={onClose}
@@ -55,7 +63,7 @@ export function SpeakerFormModal({
               </svg>
               Back
             </button>
-            <SpeakerForm onSuccess={onClose} />
+            <SpeakerForm onSuccess={handleSuccess} />
           </motion.div>
         </motion.div>
       )}

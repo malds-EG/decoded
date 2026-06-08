@@ -2,7 +2,9 @@
 
 html, body {
   overscroll-behavior: none;
+  --footer-height: clamp(500px, 60vh, 68vh);
 }
+
 
 @theme {
   --color-black: rgb(14 14 12);

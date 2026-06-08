@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const speakerTypeSchema = z.enum([
-  "employee",
+  "EG employee",
   "external",
 ]);
 
 const employeeSchema = z.object({
-  speakerType: z.literal("employee"),
+  speakerType: z.literal("EG employee"),
   fullName:     z.string().min(1, "Full name is required").max(100),
   businessUnit: z.string().min(1, "Business unit is required").max(100),
   team:         z.string().min(1, "Team is required").max(100),

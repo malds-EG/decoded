@@ -80,9 +80,9 @@ export function HeroWave() {
             <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-full w-full">
               <motion.path
                 fill={RED}
-                d={cfg.ambientPaths[0]}
-                animate={reduced ? undefined : { d: cfg.ambientPaths }}
-                transition={{ d: { repeat: Infinity, repeatType: "mirror", duration: cfg.ambientDur, ease: "easeInOut" } }}
+                initial={{ d: cfg.ambientPaths[0] }}
+                animate={{ d: reduced ? cfg.ambientPaths[0] : cfg.ambientPaths }}
+                transition={{ d: { repeat: reduced ? 0 : Infinity, repeatType: "mirror", duration: cfg.ambientDur, ease: "easeInOut" } }}
               />
             </svg>
           </div>
@@ -92,9 +92,9 @@ export function HeroWave() {
             <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-full w-full">
               <motion.path
                 fill={RED}
-                d={cfg.midPaths[0]}
-                animate={reduced ? undefined : { d: cfg.midPaths }}
-                transition={{ d: { repeat: Infinity, repeatType: "mirror", duration: cfg.midDur, ease: "easeInOut" } }}
+                initial={{ d: cfg.midPaths[0] }}
+                animate={{ d: reduced ? cfg.midPaths[0] : cfg.midPaths }}
+                transition={{ d: { repeat: reduced ? 0 : Infinity, repeatType: "mirror", duration: cfg.midDur, ease: "easeInOut" } }}
               />
             </svg>
           </div>

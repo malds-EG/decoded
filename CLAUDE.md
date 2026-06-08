@@ -22,7 +22,7 @@
 ```
 src/
 ├── app/                        # Next.js App Router (layout.tsx, page.tsx, globals.css)
-│   ├── HomeClient.tsx          # Client boundary — manages SpeakerFormModal open state
+│   ├── HomeClient.tsx          # Client boundary — manages SpeakerFormModal + FormatDrawer open state
 │   └── api/speaker-submission/ # POST route — validates + emails submission
 ├── components/                 # Shared primitives: Button, BrutalismIcon
 ├── features/                   # One folder per page section — self-contained
@@ -62,36 +62,38 @@ features/hero/
 
 ## Page Layout — `app/page.tsx`
 
-`page.tsx` is a Server Component. Static sections are passed as props to `HomeClient`, which holds the `SpeakerFormModal` open state and distributes `onApply` callbacks.
+`page.tsx` is a Server Component. Static sections are passed as props to `HomeClient`, which holds the `SpeakerFormModal` and `FormatDrawer` open state and distributes `onApply` / `onOpenFormat` callbacks.
 
 ```tsx
 {/* app/page.tsx — Server Component */}
 <HomeClient
   before={<><About /><Ticker /></>}
-  after={<><Ticker /><Reasons /><Faq /></>}
+  after={<><Ticker /><Reasons /><Faq /><div className="h-[var(--footer-height)]" aria-hidden /></>}
   footer={<Footer />}
 />
 
 {/* HomeClient renders: */}
 <Loader />
-<Nav onApply={open} />                {/* fixed top-0 z-50 */}
-<main className="flex flex-1 flex-col pb-[680px] md:pb-[650px]">
-  <Hero onApply={open} />             {/* sticky top-0 z-10 */}
-  <div className="relative">
+<Nav onApply={open} />                {/* fixed top-0 z-11 */}
+<main id="main-content" className="flex flex-1 flex-col">
+  <Hero onApply={open} />             {/* relative z-[10] — scrolls normally */}
+  <div className="relative z-[10]">
     {before}                          {/* About, Ticker */}
-    <Formats onApply={open} />
-    {after}                           {/* Ticker, Reasons, Faq */}
+    <Formats onApply={open} onOpenFormat={setActiveFormat} />
+    {after}                           {/* Ticker, Reasons, Faq, footer spacer */}
   </div>
   {footer}                            {/* Footer — fixed bottom-0 z-0 */}
 </main>
 <SpeakerFormModal isOpen={formOpen} onClose={() => setFormOpen(false)} />
+<FormatDrawer format={activeFormat} onClose={() => setActiveFormat(null)} onApply={open} />
 ```
 
-- Nav is `fixed top-0 z-50` — always above hero and all sections
-- Hero is `sticky top-0 z-10` — pinned while sections scroll over it
-- All body sections are `relative z-10` — same z-index, later in DOM = paint on top
-- Footer is `fixed inset-x-0 bottom-0 z-0 h-[680px] md:h-[650px]` — always behind content, revealed at end
-- `pb-` on main must always match footer height: `pb-[680px] md:pb-[650px]`
+- Nav is `fixed top-0 z-11` — always above hero and all sections
+- Hero is `relative z-[10]` — scrolls normally; the `relative z-[10]` wrapper comes later in DOM at the same z-level, so sections paint over the hero as they scroll up
+- Body sections wrapper is `relative z-[10]` — creates a stacking context; sections inside cover the hero
+- Footer is `fixed inset-x-0 bottom-0 z-0 h-[var(--footer-height)]` — always behind content, revealed when the footer spacer div scrolls out of view
+- Footer spacer `div.h-[var(--footer-height)]` at end of `after` prop gives the page enough scroll height to fully reveal the footer
+- `FormatDrawer` is rendered at `HomeClient` root level (outside the `relative z-[10]` wrapper) so its z-index (`z-13` panel, `z-12` backdrop) is evaluated in the root stacking context — above Nav's `z-11`
 
 ---
 
@@ -149,7 +151,7 @@ Hero → About → Ticker → Formats → Ticker → Reasons → FAQs → Footer
 
 | Section | bg | Notes |
 |---|---|---|
-| Hero | black | sticky, min-h-screen · animated SVG wave bg (`HeroWave.tsx`) |
+| Hero | black | relative z-[10], min-h-dvh · animated SVG wave bg (`HeroWave.tsx`) |
 | About | black | h-screen, text-red |
 | Ticker | white | infinite marquee, 110px height, Clash Display · starts fully visible, scrolls left |
 | Formats | red | 6 stacked cards |
@@ -179,7 +181,7 @@ Reduced motion: `useReducedMotion()` from `hooks/useReducedMotion.ts` — pass `
 
 **Page loader (`features/intro/Loader.tsx`):** `"use client"`. Full-screen black overlay (`z-[9999]`, `bg-black`). Centered `red-logo.svg` (95×95px mobile, 172×175px desktop) with `clipPath: inset(${100 - count}% 0 0 0)` filling upward. Counter at bottom-center in Clash Display bold (`clamp(36px,5vw,96px)`). Animates via Framer Motion `animate()` — 0.1s delay, 1.5s linear. After 150ms hold, `body.overflow` restored and `setVisible(false)` triggers exit (`y: "-100%"`, 1.25s, `[0.76, 0, 0.85, 1]`). **Replay on back navigation:** `popstate` listener checks `window.location.pathname` vs `lastPathname` ref — replays only if the pathname actually changed (ignores hash-only changes from footer/nav anchor links). Increments `resetKey` to re-trigger the animation `useEffect`. `next.config.ts` sets `staleTimes: { static: 0, dynamic: 0 }` so the router cache doesn't preserve `visible: false` state between navigations. Reduced motion: skips instantly.
 
-**Hero wave background (`HeroWave.tsx`):** Two blurred div layers, each with a `motion.path` that morphs between 3 random SVG keyframes. `COUNT = 10` fixed interior peaks; x positions are generated once per layer (`makeXs()`) and held constant across keyframes so morphing only interpolates Y — producing a natural mountain-range silhouette. Layer 1: ambient glow (`blur(90px)`, opacity 0.25, dur 5–12s). Layer 2: definition glow (`blur(35px)`, opacity 0.65, dur 7–16s). Both use `repeatType: "mirror"` for seamless back-and-forth. No Y-axis translation on the wrapper — the wave base stays anchored to the bottom. Peak shape tuning: adjust `baseY / minY / maxY` in the `buildKeyframes()` calls inside `useEffect`. Outer wrapper fades in `opacity: 0 → 1` over 2s after 1s delay.
+**Hero wave background (`HeroWave.tsx`):** Two blurred div layers, each with a `motion.path` that morphs between 3 random SVG keyframes. `COUNT = 10` fixed interior peaks; x positions are generated once per layer (`makeXs()`) and held constant across keyframes so morphing only interpolates Y — producing a natural mountain-range silhouette. Layer 1: ambient glow (`blur(90px)`, opacity 0.25, dur 5–12s). Layer 2: definition glow (`blur(35px)`, opacity 0.65, dur 7–16s). Both use `repeatType: "mirror"` for seamless back-and-forth. No Y-axis translation on the wrapper — the wave base stays anchored to the bottom. Peak shape tuning: adjust `baseY / minY / maxY` in the `buildKeyframes()` calls inside `useEffect`. Outer wrapper fades in `opacity: 0 → 1` over 2s after 1s delay. **Critical:** always set `initial={{ d: paths[0] }}` on `motion.path` and never pass `animate={undefined}` — use `animate={{ d: reduced ? paths[0] : paths }}` so Framer always has a valid target; passing `undefined` causes a `"undefined"` d attribute error during the animation loop.
 
 **Hero content animation (`Hero.tsx`):** `"use client"`. Logo, headline, and CTA button each fade in (`opacity: 0→1, y: 12→0`, 0.8s ease `[0.4, 0, 0.2, 1]`) with staggered delays timed to after the Loader exits: `LOGO_DELAY = 2.5s`, `TEXT_DELAY = 3.0s`, `BUTTON_DELAY = 3.3s`. `fadeIn(delay)` helper returns `{}` when `useReducedMotion()` is true. CTA calls `onApply` prop to open `SpeakerFormModal`.
 
@@ -187,15 +189,15 @@ Reduced motion: `useReducedMotion()` from `hooks/useReducedMotion.ts` — pass `
 
 **About blinds reveal (`About.tsx`):** `"use client"`. Words rendered as `<span data-word>` on SSR (fully readable). After mount, `useEffect` calls `measureLines()` which groups words by `offsetTop` (4px tolerance) into visual lines. Each line renders as `relative block overflow-hidden` with a static text span underneath and an `absolute inset-0 bg-white` `motion.span` on top. The white panel starts at `x: 0%` (covering text) and slides to `±105%` on scroll-in. Uses `variants` with `hidden: { transition: { duration: 0 } }` for instant off-screen reset so the animation replays every time the section enters the viewport (`once: false`).
 
-**Ticker seamless loop:** `TickerContent` uses `pr-8 md:pr-[30px]` (right padding only — provides the gap between the last word of one copy and the first word of the next). Renders **3 copies** animating `x: ["0%", "-33.33%"]`. Duration 35s. Separator between words is `next/image` `red-logo.svg` (`size-[72px] md:size-[64px]`), replacing the old inline Bauhaus SVG.
+**Ticker seamless loop:** `TickerContent` renders 8× repeated words (via `useMemo`) with `pr-8 md:pr-[30px]` gap. A hidden measuring copy is mounted off-screen with a `ResizeObserver` to read the exact pixel `scrollWidth` into `contentWidth` state. The visible `motion.div` renders **2 copies** and animates `x: [0, -contentWidth]` in pixels (duration 90s, `linear`, `repeatType: "loop"`) — pixel values are reliable across window resizes unlike percentage-based approaches. Separator between words is `next/image` `red-logo.svg` (`size-[72px] md:size-[64px]`).
 
 **Roll-up hover (nav links, footer links):** Use Tailwind CSS transitions, not Framer Motion. Parent must be `relative block overflow-hidden group` — `block` is required; inline elements do not clip absolutely positioned children. Two stacked `<span>`s inside: first `block group-hover:-translate-y-full`; second `absolute inset-0 translate-y-full group-hover:translate-y-0`. Used in `Nav.tsx` desktop links and footer `RollLink` component.
 
-**Footer (`features/footer/Footer.tsx`):** `"use client"` (needed for smooth scroll). Fixed `bottom-0 z-0 h-[680px] md:h-[650px]` red, `px-[30px] py-8`. Hash links (`#hero`, `#about`, etc.) use same `scrollIntoView({ behavior: "smooth" })` as the nav — `mailto:` and external links use default browser behaviour. **Top:** `( Programme )` label + Clash Display description left (max-w 367px); Navigation / Contact / Connect columns right — stack `flex-col` below `md`, go `flex-row` at `md+`. Navigation links are `uppercase tracking-wider font-headline`. **Bottom:** Decoded wordmark logo spans `w-full` (`brightness-0`) + copyright bar. **Responsive:** top section stacks `flex-col` on mobile (lg → row); mobile bottom order is copyright → powered by + Amplify logo → Decoded logo; desktop bottom is logo → copyright | powered-by row. `footer.data.ts` contains all copy. Amplify logo at `public/Amplify-logo.svg`.
+**Footer (`features/footer/Footer.tsx`):** `"use client"` (needed for smooth scroll). Fixed `bottom-0 z-0 h-[clamp(400px,62vh,88vh)]` red, `px-5 py-6 md:px-8`. Hash links (`#hero`, `#about`, etc.) use same `scrollIntoView({ behavior: "smooth" })` as the nav — `mailto:` and external links use default browser behaviour. **Top:** `( Programme )` label + Clash Display description left (max-w 367px); Navigation / Contact / Connect columns right — stack `flex-col` below `md`, go `flex-row` at `md+`. Navigation links are `uppercase tracking-wider font-headline`. **Bottom:** Decoded wordmark logo spans `w-full` (`brightness-0`) + copyright bar. **Responsive:** top section stacks `flex-col` on mobile (lg → row); mobile bottom order is copyright → powered by + Amplify logo → Decoded logo; desktop bottom is logo → copyright | powered-by row. `footer.data.ts` contains all copy. Amplify logo at `public/Amplify-logo.svg`.
 
 **FormatCard pixel mask reveal (`FormatCard.tsx`):** `"use client"`. Image covered by a single `<canvas>` (replaces old 450-div grid — 1 DOM node vs 2,700). `PixelCanvas` component: `ResizeObserver` syncs buffer at `displaySize × devicePixelRatio`; draws white cover before animation starts. On `inView`, one `rAF` loop runs: red pass first (behind), white pass on top — per-cell opacities computed from `Float32Array` timings built once at start. `BLEED` (≤0.18s early white start) exposes red below the scan line; `JITTER` (≤0.1s extra red delay) leaves fragments above it. Loop cancels itself after all cells clear. Tunables: `GRID / REVEAL_DELAY / REVEAL_DURATION / WHITE_DUR / RED_DUR / JITTER / BLEED`. `onOpen?: () => void` prop — clicking the image or "Learn more" button opens `FormatDrawer`. Image paths: `/${name.toLowerCase().replace(/\s/g, "-")}.png`. Reduced motion skips canvas entirely. **Learn more button** matches Framer's "ye" component (`j75bhEKWC`): `w-full bg-grey/30 rounded-lg p-6 md:p-[30px]`, space-between flex, `ArrowCircleUpRight` from `@phosphor-icons/react` (24px, nudges up-right on hover), hover bg `grey/50`.
 
-**FormatDrawer (`features/formats/FormatDrawer.tsx`):** `"use client"`. Fixed right panel `w-full lg:max-w-[50vw]` (`z-60`, `bg-black`), scrollable. Slides in `x: "100%" → 0` ease `[0.22, 1, 0.36, 1]` over 450ms. Backdrop (`bg-black/70 backdrop-blur-sm`, `z-60`) closes on click. `Escape` key closes; body scroll locked while open. `Formats.tsx` holds `active: Format | null` state. Layout (top→bottom): header row (format name left + close button right) · image (`w-full md:max-w-[55%]`, `aspect-[4/3]`, `object-cover`) · four `Row` content sections (dot label left + content right, stacks vertically on mobile via `flex-col md:grid`) · "Apply to speak" CTA (`w-4/5` centered, `bg-red`) calls `onApply` prop to open `SpeakerFormModal` · footer `mt-auto`. **Four rows:** "What it is" (paragraph) · "Best for" (list with `border-white/70` item dividers) · "How it runs" (2-col table: label `text-white/25` | value `text-white/50`, `divide-white/70`) · "What to expect" (3 blocks: bold title + dim description). All row separators use `border-white/70`. Data comes from `formats.data.ts` — `FormatMeta` + `ExpectBlock` types, rich content for all 6 formats (heroTitle, tag, drawerTitle, whatItIs, bestFor, meta, expect).
+**FormatDrawer (`features/formats/FormatDrawer.tsx`):** `"use client"`. Fixed right panel `w-full lg:max-w-[50vw]` (`z-13`, `bg-black`), scrollable. Slides in `x: "100%" → 0` ease `[0.22, 1, 0.36, 1]` over 300ms. Backdrop (`bg-black/60 backdrop-blur-xs`, `z-12`) closes on click. `Escape` key closes; body scroll locked while open. **State lives in `HomeClient`** (`activeFormat: Format | null`) — `Formats.tsx` fires `onOpenFormat(format)` prop, `HomeClient` renders `<FormatDrawer>` outside the `relative z-[10]` wrapper so its z-indices sit in the root stacking context above Nav (`z-11`). Layout (top→bottom): header row (format name left + close button right) · image (`w-full md:max-w-[75%]`, `aspect-[4/3]`, `object-cover`) · four `Row` content sections (dot label left + content right, stacks vertically on mobile via `flex-col md:grid`) · "Apply to speak" CTA (full-width, `bg-red`) calls `onApply` prop to open `SpeakerFormModal` · footer `mt-auto`. **Four rows:** "What it is" (paragraph) · "Best for" (list with `border-white/50` item dividers) · "How it runs" (2-col table: label `text-white/80` | value `text-white/50`, `divide-white/50`) · "What to expect" (3 blocks: bold title + dim description). All row separators use `border-white/20`. Data comes from `formats.data.ts` — `FormatMeta` + `ExpectBlock` types, rich content for all 6 formats (heroTitle, tag, drawerTitle, whatItIs, bestFor, meta, expect).
 
 ---
 
@@ -203,17 +205,17 @@ Reduced motion: `useReducedMotion()` from `hooks/useReducedMotion.ts` — pass `
 
 Session submission flow for potential speakers. Rendered as an overlay modal on the homepage — no separate page.
 
-**Modal (`features/speaker-form/SpeakerFormModal.tsx`):** `"use client"`. `AnimatePresence` wraps a full-screen backdrop (`bg-black/80 backdrop-blur-sm`, `z-[9998]`). Inner card: `max-w-2xl rounded-2xl bg-grey/60 backdrop-blur-md`. Slides in `opacity: 0, y: 24 → 1, 0` (350ms, `[0.22, 1, 0.36, 1]`). Back button (arrow SVG) calls `onClose`. Body scroll locked via `document.body.style.overflow = "hidden"` while open. Renders `<SpeakerForm onSuccess={onClose} />`. Triggered by `onApply` callbacks on `Nav`, `Hero`, and `Formats` — state lives in `HomeClient`.
+**Modal (`features/speaker-form/SpeakerFormModal.tsx`):** `"use client"`. `AnimatePresence` wraps a full-screen backdrop (`bg-black/80 backdrop-blur-sm`, `z-[9998]`). Inner card: `max-w-2xl rounded-2xl bg-grey/60 backdrop-blur-md`. Slides in `opacity: 0, y: 24 → 1, 0` (450ms, `[0.4, 0, 0.2, 1]`); exits `opacity: 1→0, y: 0→24` same duration. Backdrop fades 0.35s `easeInOut`. Back button (arrow SVG) calls `onClose`. Body scroll locked via `document.body.style.overflow = "hidden"` while open. Renders `<SpeakerForm onSuccess={onClose} />`. Triggered by `onApply` callbacks on `Nav`, `Hero`, and `Formats` — state lives in `HomeClient`.
 
-**Form (`features/speaker-form/SpeakerForm.tsx`):** `"use client"`. `react-hook-form` + `zodResolver`. Card is `bg-black/70 backdrop-blur-md border-white/20`. `speakerType` defaults to `undefined` — form is hidden until a type is selected. Selecting a type reveals an animated **Continue** button (slides up, bouncing arrow). Clicking Continue locks the radios (disabled + unselected fades to 25% opacity) and reveals the full form with a `y: 0, opacity: 1` entrance. `defaultValues` cast as `DefaultValues<SessionSubmissionFormValues>` to satisfy the discriminated union type. `gcx@eg.dk` rendered as `<a href="mailto:gcx@eg.dk">`. On submit: loading state + disabled button → POST `/api/speaker-submission` → `SuccessModal` (5s countdown + calls `onSuccess`) or inline error.
+**Form (`features/speaker-form/SpeakerForm.tsx`):** `"use client"`. `react-hook-form` + `zodResolver`. Card is `bg-black/70 backdrop-blur-md border-white/20`. `speakerType` defaults to `undefined` — form is hidden until a type is selected. Selecting a type reveals an animated **Continue** button (slides up, bouncing arrow). Clicking Continue locks the radios (disabled + unselected fades to 25% opacity) and reveals the full form with a `y: 0, opacity: 1` entrance. `defaultValues` cast as `DefaultValues<SessionSubmissionFormValues>` to satisfy the discriminated union type. `gcx@eg.dk` rendered as `<a href="mailto:gcx@eg.dk">`. On submit: loading state + disabled button → POST `/api/speaker-submission` → `SuccessModal` (5s countdown + calls `onSuccess`) or inline error. **SuccessModal:** countdown and `onDone` are split into two separate `useEffect`s — one ticks the interval (`setCount`), a second fires `onDone` when `count === 0`. Never call a parent setState inside a child's state updater function (causes React setState-in-render warning).
 
-**Validation (`lib/validation/schema.ts`):** Zod v4. `z.discriminatedUnion("speakerType", [...])` intersected with `sessionFields`. All fields have explicit error messages and `max()` caps. Shared between client (RHF resolver) and server (`safeParse` in route).
+**Validation (`lib/validation/schema.ts`):** Zod v4. `z.discriminatedUnion("speakerType", [...])` intersected with `sessionFields`. speakerType enum values: `"EG employee"` | `"external"`. All fields have explicit error messages and `max()` caps. Shared between client (RHF resolver) and server (`safeParse` in route).
 
 **API route (`app/api/speaker-submission/route.ts`):** JSON parse (try/catch) → `safeParse` (400 on invalid) → `buildAdminEmail()` (sectioned HTML table, all values HTML-escaped) → `sendSessionSubmissionEmail` → fire-and-forget `sendConfirmationEmail`. **Email sends are live** — remove the Azure env vars to disable.
 
 **Email (`lib/email/`):**
 - `transporter.ts` — `SESv2Client` from `@aws-sdk/client-sesv2`. Region hardcoded to `eu-central-1`. No credentials passed — SDK auto-picks the ECS task role via the container credentials endpoint. Exports `sendMail({ to, subject, html, text? })` helper (returns `MessageId`), `SENDER_EMAIL` (`no-reply@insights.amplify.egsync.com`), and `ADMIN_EMAILS` (from env, comma-separated string array).
-- `send-session-submission.ts` — `sendSessionSubmissionEmail` (admin notification) + `sendConfirmationEmail` (applicant). Both functions call `sendMail` directly — **emails are live**. Confirmation email is a fully responsive dark HTML template (`max-width:640px`, `#1e1e1e` bg) with: red header bar (`#e81a2d`) holding `decoded-logo-email.png` + `EG Logo V2 1.png` left and `Decoded Icon V3 1.png` overflowing right (`margin-bottom:-28px`); "WE GOT YOUR PROPOSAL" heading; body copy; "WHAT HAPPENS NEXT" 3-step table (Review / Discovery call / Confirmed); CTA banner (`rgb(72,18,18)`) with `gcx@eg.dk` + "GET IN TOUCH" button; footer (black, `decoded-logo-email.png` + copyright). **Fonts:** `@font-face` loads `ClashDisplay-Semibold.woff2` (headings) and `Aileron-600/700.woff2` (body) from `${NEXT_PUBLIC_BASE_URL}/fonts/` — falls back to `sans-serif`. **Responsive:** `@media (max-width:600px)` stacks step rows and CTA banner columns.
+- `send-session-submission.ts` — `sendSessionSubmissionEmail` (admin notification) + `sendConfirmationEmail` (applicant). Both functions call `sendMail` directly — **emails are live**. Confirmation email is a fully responsive dark HTML template (`max-width:640px`, `#1e1e1e` bg) with: red header bar (`#e81a2d`) holding `Decoded Logo V4 1.png` + `EG Logo V2 1.png`; "WE GOT YOUR PROPOSAL" heading; body copy; "WHAT HAPPENS NEXT" 3-step table (Review / Discovery call / Confirmed); CTA banner (`rgb(72,18,18)`) with `gcx@eg.dk` + "GET IN TOUCH" button; footer (black, `Decoded Logo V4 1.png` at 45% opacity + copyright). **Fonts:** `@font-face` loads `ClashDisplay-Semibold.woff2` (headings) and `Aileron-600/700.woff2` (body) from `${NEXT_PUBLIC_BASE_URL}/fonts/` — falls back to `sans-serif`. **Responsive:** `@media (max-width:600px)` stacks step rows and CTA banner columns; CTA button is `width:100%; text-align:center; box-sizing:border-box`. **Critical:** email clients (Gmail, Outlook, Apple Mail) do not support CSS custom properties — never use `var(--*)` in email HTML; always use literal hex/rgb values.
 
 **Required env vars:**
 ```
@@ -241,11 +243,11 @@ Built from Framer's `/404` page (`nodeId="BigvQa7Dl"`). `"use client"` for Frame
 
 ```ts
 experimental: {
-  staleTimes: { static: 0, dynamic: 0 }
+  staleTimes: { static: 30, dynamic: 30 }
 }
 ```
 
-Disables the client-side router cache so navigating back to any page forces a fresh component mount. Required for the Loader animation to replay correctly on back navigation.
+Limits the client-side router cache TTL to 30s — short enough that navigating back replays the Loader animation without fully disabling the cache.
 
 ---
 

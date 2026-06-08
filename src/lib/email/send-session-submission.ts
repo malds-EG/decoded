@@ -51,26 +51,10 @@ export async function sendConfirmationEmail({
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Tokens ── */
-    :root {
-      --red:        #e81a2d;
-      --red-dark:   rgb(72, 18, 18);
-      --red-btn:    rgb(152, 42, 42);
-      --bg:         #1e1e1e;
-      --card-bg:    #1e1e1e;
-      --footer-bg:  #000;
-      --text-primary:   #f0ede6;
-      --text-secondary: #9aa0ac;
-      --text-muted:     #6d7585;
-      --divider:    #6d7585;
-      --font-display: 'Clash Display', sans-serif;
-      --font-body:    'Aileron', sans-serif;
-    }
-
     body {
-      background: var(--bg);
+      background: #1e1e1e;
       -webkit-font-smoothing: antialiased;
-      font-family: var(--font-body);
+      font-family: 'Aileron', sans-serif;
       padding: 40px 16px;
     }
 
@@ -78,14 +62,14 @@ export async function sendConfirmationEmail({
     .wrapper {
       max-width: 640px;
       margin: 0 auto;
-      background: var(--card-bg);
+      background: #1e1e1e;
     }
 
     /* ──────────────────────────────
        HEADER
     ────────────────────────────── */
     .header {
-      background: var(--red);
+      background: #e81a2d;
       padding: 16px 24px 0;
       display: flex;
       align-items: flex-end;
@@ -106,25 +90,6 @@ export async function sendConfirmationEmail({
       filter: brightness(0) invert(1);
     }
 
-    .header-icon {
-      display: block;
-      width: 56px;
-      height: 56px;
-      margin-bottom: -28px;
-      position: relative;
-      z-index: 1;
-      /* Decorative geometric shape – salmon/pink chevrons */
-      flex-shrink: 0;
-    }
-
-    /* SVG chevron icon rendered inline since we have no asset path */
-    .header-icon-svg {
-      width: 56px;
-      height: 56px;
-      margin-bottom: -28px;
-      flex-shrink: 0;
-    }
-
     /* ──────────────────────────────
        GREETING
     ────────────────────────────── */
@@ -133,25 +98,25 @@ export async function sendConfirmationEmail({
     }
 
     .greeting-heading {
-      font-family: var(--font-display);
+      font-family: 'Clash Display', sans-serif;
       font-size: 22px;
       font-weight: 600;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: var(--text-primary);
+      color: #f0ede6;
       line-height: 1.25;
       margin-bottom: 16px;
     }
 
     .greeting-heading span {
-      color: var(--red);
+      color: #e81a2d;
     }
 
     .greeting-body {
-      font-family: var(--font-body);
+      font-family: 'Aileron', sans-serif;
       font-size: 15px;
       line-height: 1.7;
-      color: var(--text-secondary);
+      color: #9aa0ac;
     }
 
     /* ──────────────────────────────
@@ -160,7 +125,7 @@ export async function sendConfirmationEmail({
     .divider {
       margin: 28px 48px 0;
       height: 1px;
-      background: var(--divider);
+      background: #6d7585;
     }
 
     /* ──────────────────────────────
@@ -171,12 +136,12 @@ export async function sendConfirmationEmail({
     }
 
     .steps-eyebrow {
-      font-family: var(--font-display);
-      font-size: 11px;
+      font-family: 'Clash Display', sans-serif;
+      font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: #a0abf4;
       margin-bottom: 20px;
     }
 
@@ -195,20 +160,20 @@ export async function sendConfirmationEmail({
     }
 
     .step-label {
-      font-family: var(--font-body);
+      font-family: 'Aileron', sans-serif;
       font-size: 13px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: #f0ede6;
       white-space: nowrap;
       padding-right: 20px;
       width: 130px;
     }
 
     .step-value {
-      font-family: var(--font-body);
+      font-family: 'Aileron', sans-serif;
       font-size: 14px;
       line-height: 1.65;
-      color: var(--text-secondary);
+      color: #9aa0ac;
     }
 
     /* ──────────────────────────────
@@ -219,7 +184,7 @@ export async function sendConfirmationEmail({
     }
 
     .cta-inner {
-      background: var(--red-dark);
+      background: rgb(72, 18, 18);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -230,21 +195,21 @@ export async function sendConfirmationEmail({
     }
 
     .cta-text-title {
-      font-family: var(--font-body);
+      font-family: 'Aileron', sans-serif;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: #f0ede6;
       margin-bottom: 3px;
     }
 
     .cta-text-sub {
-      font-family: var(--font-body);
+      font-family: 'Aileron', sans-serif;
       font-size: 12px;
-      color: var(--text-secondary);
+      color: #9aa0ac;
     }
 
     .cta-text-sub a {
-      color: var(--red);
+      color: #e81a2d;
       text-decoration: none;
     }
 
@@ -255,14 +220,14 @@ export async function sendConfirmationEmail({
 
     .cta-btn {
       display: inline-block;
-      background: var(--red-btn);
+      background: rgb(152, 42, 42);
       padding: 10px 18px;
-      font-family: var(--font-display);
+      font-family: 'Clash Display', sans-serif;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--text-primary);
+      color: #f0ede6;
       text-decoration: none;
       white-space: nowrap;
     }
@@ -271,7 +236,7 @@ export async function sendConfirmationEmail({
        FOOTER
     ────────────────────────────── */
     .footer {
-      background: var(--footer-bg);
+      background: #000;
       padding: 12px 16px;
       display: flex;
       align-items: center;
@@ -280,13 +245,13 @@ export async function sendConfirmationEmail({
 
     .footer-logo img {
       display: block;
-      filter: brightness(0) invert(1);
+      filter: brightness(0) invert(1) opacity(0.45);
     }
 
     .footer-copy {
-      font-family: var(--font-body);
+      font-family: 'Aileron', sans-serif;
       font-size: 11px;
-      color: var(--text-muted);
+      color: #6d7585;
       white-space: nowrap;
     }
 
@@ -308,14 +273,19 @@ export async function sendConfirmationEmail({
       .cta-btn-wrap {
         padding: 0 16px 14px;
         width: 100%;
+        box-sizing: border-box;
       }
 
-      .cta-btn { display: block; text-align: left; }
+      .cta-btn { display: block; text-align: center; width: 100%; box-sizing: border-box; }
 
       .steps-table,
       .steps-table tbody,
       .steps-table tr,
       .steps-table td { display: block; width: 100%; }
+
+      .steps-eyebrow { 
+        font-size: 18px; 
+      }
 
       .step-label {
         white-space: normal;
@@ -343,11 +313,7 @@ export async function sendConfirmationEmail({
       <img src="${base}/EG Logo V2 1.png" alt="EG" height="20">
     </div>
     <!-- Decorative icon: replace with your actual asset or keep this SVG chevron -->
-    <svg class="header-icon-svg" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <polygon points="0,56 28,0 56,56 42,56 28,28 14,56" fill="rgba(240,100,100,0.55)"/>
-      <polygon points="8,56 28,16 48,56 38,56 28,36 18,56" fill="rgba(240,100,100,0.35)"/>
-    </svg>
-  </div>
+      </div>
 
   <!-- ── Greeting ── -->
   <div class="section-greeting">
@@ -356,7 +322,7 @@ export async function sendConfirmationEmail({
       <span>${safeName}</span>
     </h1>
     <p class="greeting-body">
-      Thanks for submitting to Decoded. Our team reviews every proposal carefully and will be in touch within 5 working days.
+      Thank you for submitting your proposal to Decoded. Our team will review your proposal carefully and will be in touch within 5 working days.
     </p>
   </div>
 
@@ -377,7 +343,7 @@ export async function sendConfirmationEmail({
           <td class="step-value">If it's a fit, we'll reach out to schedule a 30-minute conversation about your session.</td>
         </tr>
         <tr>
-          <td class="step-label">3. Confirmed:</td>
+          <td class="step-label" style="padding-bottom: 16px;">3. Confirmed:</td>
           <td class="step-value">Format, date, and logistics locked. We handle everything from here.</td>
         </tr>
       </tbody>
@@ -403,7 +369,7 @@ export async function sendConfirmationEmail({
   <!-- ── Footer ── -->
   <div class="footer">
     <div class="footer-logo">
-      <img src="${base}/Decoded Logo V4 1.png" alt="Decoded" width="80" height="12">
+      <img src="${base}/Decoded Logo V4 1.png" alt="Decoded-footer" width="80" height="12">
     </div>
     <span class="footer-copy">© 2026 EG. All rights reserved</span>
   </div>

@@ -15,7 +15,7 @@ function Row({ label, children }: RowProps) {
     <div className="flex flex-col gap-5 border-t border-white/20 py-6 md:grid md:grid-cols-[140px_1fr] md:gap-12 md:py-8">
       <div className="flex items-center h-fit gap-2.5">
         <span className="mt-[3px] size-2 shrink-0 rounded-full bg-white/25" />
-        <span className="font-headline uppercase text-sm font-medium text-off-white">{label}</span>
+        <span className="font-headline uppercase text-sm xl:text-lg font-medium text-off-white">{label}</span>
       </div>
       <div>{children}</div>
     </div>
@@ -67,7 +67,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-60 bg-black/50 backdrop-blur-xs"
+            className="fixed inset-0 z-[13] bg-black/60 backdrop-blur-xs"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -129,7 +129,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
             <div className="mt-6 px-8">
               {/* What it is */}
               <Row label="What it is">
-                <p className="font-body text-[16px] leading-[1.7] text-white/70">
+                <p className="font-body text-[16px] lg:text-[18px] 2xl:text-[20px] leading-[1.7] text-white/70">
                   {format.whatItIs}
                 </p>
               </Row>
@@ -137,7 +137,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
 
               {/* Best for */}
               <Row label="Best for">
-                <div className="font-body text-[16px] text-white/70">
+                <div className="font-body text-[16px] lg:text-[18px] 2xl:text-[20px] text-white/70">
                   {format.bestFor.map((item, i) => (
                     <p
                       key={i}
@@ -158,10 +158,10 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
                 <div className="divide-y divide-white/50">
                   {META_KEYS.map((key) => (
                     <div key={key} className="grid grid-cols-[100px_1fr] gap-4 py-3 sm:grid-cols-[140px_1fr]">
-                      <span className="font-body text-md font-medium text-white/80 self-center">
+                      <span className="font-body text-md 2xl:text-xl font-medium text-white/80 self-center">
                         {META_LABELS[key]}
                       </span>
-                      <span className="font-body text-[16px] text-white/50 self-center">
+                      <span className="font-body text-[16px] lg:text-[18px] 2xl:text-[20px] text-white/50 self-center">
                         {format.meta[key]}
                       </span>
                     </div>
@@ -174,10 +174,10 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
                 <div className="flex flex-col gap-6">
                   {format.expect.map((block, i) => (
                     <div key={i}>
-                      <p className="font-body text-md font-medium text-white/80 mb-1.5">
+                      <p className="font-body text-md 2xl:text-xl font-medium text-white/80 mb-1.5">
                         {block.title}
                       </p>
-                      <p className="font-body text-[16px] text-white/50">
+                      <p className="font-body text-[16px] lg:text-[18px] 2xl:text-[20px] text-white/50">
                         {block.desc}
                       </p>
                     </div>
@@ -190,7 +190,7 @@ export function FormatDrawer({ format, onClose, onApply }: Props) {
             <div className="mt-auto flex justify-start w-full px-8 py-8">
               <button
                 onClick={() => { onClose(); onApply?.(); }}
-                className="block w-full rounded-lg bg-red py-4 text-center font-body font-semibold text-white transition-opacity hover:opacity-90"
+                className="block w-full rounded-lg bg-red py-4 text-center text-[16px] 2xl:text-[24px] font-body font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Apply to speak
               </button>

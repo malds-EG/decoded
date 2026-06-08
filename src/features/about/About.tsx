@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { aboutContent } from "./about.data";
-
 export function About() {
   const reduced = useReducedMotion();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -13,7 +12,7 @@ export function About() {
   return (
     <section
       id="about"
-      className="relative z-10 flex min-h-screen items-center justify-center bg-black md:p-[100px] py-[100px] px-[60px] text-red md:px-8"
+      className="relative z-[10] flex min-h-screen items-center justify-center bg-black md:p-[100px] py-[100px] px-[60px] text-red md:px-8"
     >
       <h2
         ref={headingRef}
