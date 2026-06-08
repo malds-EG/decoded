@@ -11,7 +11,7 @@ const employeeSchema = z.object({
   businessUnit: z.string().min(1, "Business unit is required").max(100),
   team:         z.string().min(1, "Team is required").max(100),
   jobTitle:     z.string().min(1, "Job title is required").max(100),
-  email:        z.email("Invalid email address"),
+  email:        z.email("Invalid email address").max(254),
   linkedin:     z.url("Must be a valid URL").refine(
     (url) => url.includes("linkedin.com"),
     "Must be a LinkedIn URL",
@@ -23,7 +23,7 @@ const externalSpeakerSchema = z.object({
   fullName:    z.string().min(1, "Full name is required").max(100),
   jobTitle:    z.string().min(1, "Job title is required").max(100),
   company:     z.string().min(1, "Company is required").max(100),
-  email:       z.email("Invalid email address"),
+  email:       z.email("Invalid email address").max(254),
   linkedin:    z.url("Must be a valid URL").refine(
     (url) => url.includes("linkedin.com"),
     "Must be a LinkedIn URL",
@@ -42,7 +42,7 @@ const sessionFields = z.object({
     "workshop",
   ]),
   sessionAbstract:   z.string().min(20, "Abstract must be at least 20 characters").max(3000),
-  speakerBio:        z.string().min(1, "Bio is required").max(1000),
+  speakerBio:        z.string().min(20, "Bio must be at least 40 characters").max(1000),
   avRequirements:    z.string().min(1, "Please describe your AV requirements").max(500),
   heardAboutDecoded: z.string().min(1, "This field is required").max(500),
 });

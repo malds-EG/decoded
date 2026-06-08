@@ -32,7 +32,7 @@ export function Hero({ onApply }: { onApply?: () => void }) {
         <HeroWave />
       </div>
       <div className="relative z-[10] flex w-full max-w-[1440px] flex-col items-center justify-center overflow-hidden px-5 mt-12 md:px-8">
-        <motion.div data-hero-logo className="flex w-full flex-col items-center justify-center" {...fadeIn(2.5)}>
+        <motion.div data-hero-logo className="flex w-full flex-col items-center justify-center" {...fadeIn(2.6)}>
           <Image
             src={heroContent.logo.src}
             alt={heroContent.logo.alt}
@@ -51,7 +51,7 @@ export function Hero({ onApply }: { onApply?: () => void }) {
           </motion.h1>
           <motion.div 
            className="flex flex-col items-center gap-[34px]"
-            {...fadeIn(3.3)}
+            {...fadeIn(3.1)}
           > 
           <ApplyToSpeakButton onClick={onApply} />
            <div>
